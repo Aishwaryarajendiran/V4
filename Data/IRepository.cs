@@ -20,5 +20,7 @@ namespace V4_API_Movies_M2M_RepoPattern_EF_CodeFirst_Identity_JWTToken.Data
         
         bool AddMovie(MovieDTO movie);
         IEnumerable<Movie> GetMovies();
+        bool UpdateMovie(MovieDTO movie);
+        bool DeleteMovie(Movie movie);
     }
 }

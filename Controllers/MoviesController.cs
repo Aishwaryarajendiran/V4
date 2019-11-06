@@ -62,14 +62,35 @@ namespace V4_API_Movies_M2M_RepoPattern_EF_CodeFirst_Identity_JWTToken.Controlle
 
         // PUT: api/Movies/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, [FromBody] MovieDTO movie)
         {
+            if (ModelState.IsValid && id==movie.Movie.Id)
+            {
+                bool result = repository.UpdateMovie(movie);
+                if (result)
+                {
+                    return Ok();
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            return BadRequest(ModelState);
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            var movie = repository.GetMovie(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            bool result = repository.DeleteMovie(movie);
+            if (result)
+            {
+                return Ok();
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }

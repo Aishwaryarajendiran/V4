@@ -57,7 +57,7 @@ namespace V4_API_Movies_M2M_RepoPattern_EF_CodeFirst_Identity_JWTToken.Data
 
         public bool AddMovie(MovieDTO movie)
         {
-            {
+            
                 try
                 {
                     context.Movies.Add(movie.Movie);
@@ -80,7 +80,7 @@ namespace V4_API_Movies_M2M_RepoPattern_EF_CodeFirst_Identity_JWTToken.Data
 
                     throw;
                 }
-            }
+            
         }
 
         public bool DeleteActor(Actor actor)
@@ -90,6 +90,27 @@ namespace V4_API_Movies_M2M_RepoPattern_EF_CodeFirst_Identity_JWTToken.Data
                 context.Actors.Remove(actor);
                 int result = context.SaveChanges();
                 if(result > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public bool DeleteMovie(Movie movie)
+        {
+            try
+            {
+                context.Movies.Remove(movie);
+                var movieActors = context.MovieActors.Where(ma => ma.Movie == movie);
+                context.MovieActors.RemoveRange(movieActors);
+                int result = context.SaveChanges();
+                if (result > 0)
                 {
                     return true;
                 }
@@ -141,6 +162,34 @@ namespace V4_API_Movies_M2M_RepoPattern_EF_CodeFirst_Identity_JWTToken.Data
             }
         }
 
-        
+        public bool UpdateMovie(MovieDTO movie)
+        {
+            try
+            {
+                context.Movies.Update(movie.Movie);
+                var movieActors = context.MovieActors.Where(ma => ma.Movie == movie.Movie);
+                context.MovieActors.RemoveRange(movieActors);
+                //remove all relations
+                
+                foreach (var actorId in movie.Actors)
+                {
+                    context.MovieActors.Add(new MovieActor
+                    {
+                        Movie = movie.Movie,
+                        Actor = context.Actors.Find(actorId)
+                    });
+                    context.SaveChanges();
+                }
+                context.SaveChanges();
+
+                return true;
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }
